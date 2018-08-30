@@ -15,7 +15,7 @@
   (:name "mastodon"
    :keymap *mstdn-mode-keymap*))
 
-(define-constant *mstdn-buffer-name* "Mastodon")
+(define-constant *htl-buffer-name* "Mastodon")
 
 (defun select-window (window)
   (setf (current-window) window))
@@ -23,20 +23,22 @@
 (defun make-mstdn-buffer (name)
   (change-buffer-mode (make-buffer name) 'mstdn-mode))
 
+(defun get-htl-buffer ()
+  (make-mstdn-buffer *htl-buffer-name*))
+
+(defun get-htl-windows ()
+  (get-buffer-windows (get-htl-buffer)))
+
 (define-command mstdn-show () ()
-  (let* ((buffer (make-mstdn-buffer *mstdn-buffer-name*))
-         (window (display-buffer buffer)))
-    (select-window window)))
+  (select-window
+   (display-buffer (get-htl-buffer))))
 
 (define-command mstdn-hide () ()
-  (let* ((buffer (make-mstdn-buffer *mstdn-buffer-name*))
-         (windows (get-buffer-windows buffer)))
-    (loop for w in windows
-          do (delete-window w))))
+  (loop for w in (get-htl-windows)
+        do (delete-window w)))
 
 (define-command mstdn-toggle () ()
-  (let* ((buffer (make-mstdn-buffer *mstdn-buffer-name*))
-         (windows (get-buffer-windows buffer)))
+  (let ((windows (get-htl-windows)))
     (if (null windows)
       (mstdn-show)
       (mstdn-hide))))
